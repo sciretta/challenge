@@ -1,0 +1,25 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type VehicleDTO {
+  makeId: Int!
+  makeName: String!
+  vehicleTypes: [VehicleTypesDTO!]!
+}
+
+type VehicleTypesDTO {
+  typeId: Int!
+  typeName: String!
+}
+
+type Query {
+  getVehicles(filter: Filter!): [VehicleDTO!]!
+}
+
+input Filter {
+  currentPage: Int!
+  pages: Int!
+  make: String
+  type: String
+}
