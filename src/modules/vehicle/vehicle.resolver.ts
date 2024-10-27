@@ -10,7 +10,6 @@ export class VehicleResolver {
   async getVehicles(
     @Args("filter", { type: () => Filter }) filter: Filter
   ): Promise<VehicleDTO[]> {
-    console.log("FILTER", filter);
     return await this.vehicleService.getVehicles(filter);
   }
 }
