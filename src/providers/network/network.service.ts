@@ -24,8 +24,11 @@ export class NetworkService {
         response.data
       );
       return jsonData;
-    } catch (error) {
-      throw new Error(`Error fetching makes: ${error.message}`);
+    } catch (err) {
+      console.error("NetworkService Error on method getVehicleMakes", err);
+      throw new Error(
+        `NetworkService Error on method getVehicleMakes: ${err.message}`
+      );
     }
   }
 
@@ -39,8 +42,11 @@ export class NetworkService {
         response.data
       );
       return jsonData;
-    } catch (error) {
-      throw new Error(`Error fetching types: ${error.message}`);
+    } catch (err) {
+      console.error("NetworkService Error on method getVehicleTypes", err);
+      throw new Error(
+        `NetworkService Error on method getVehicleTypes: ${err.message}`
+      );
     }
   }
 }

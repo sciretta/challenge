@@ -32,7 +32,7 @@ export class Filter {
   @Field(() => Int)
   @IsInt()
   @Min(1) // Asume que `pages` debe ser al menos 1
-  pages: number;
+  limit: number;
 
   @Field(() => String, { nullable: true }) // `nullable` indica que el campo es opcional
   @IsOptional()

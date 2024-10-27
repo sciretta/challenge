@@ -33,7 +33,13 @@ export class DatabaseService {
 
       await this.vehicleMakeModel.bulkWrite(bulkOperations);
     } catch (err) {
-      console.error("Error saving Vehicle Makes:", err);
+      console.error(
+        "DatabaseService Error on method saveVehicleMakesBulk",
+        err
+      );
+      throw new Error(
+        `DatabaseService Error on method saveVehicleMakesBulk: ${err.message}`
+      );
     }
   }
 
@@ -51,7 +57,13 @@ export class DatabaseService {
 
       await this.vehicleTypeModel.bulkWrite(bulkOperations);
     } catch (err) {
-      console.error("Error saving Vehicle Types:", err);
+      console.error(
+        "DatabaseService Error on method saveVehicleTypeBulk:",
+        err
+      );
+      throw new Error(
+        `DatabaseService Error on method saveVehicleTypeBulk: ${err.message}`
+      );
     }
   }
 
@@ -59,20 +71,29 @@ export class DatabaseService {
     try {
       return await this.vehicleMakeModel.countDocuments().exec();
     } catch (err) {
-      console.error("Error getting Vehicle Makes count:", err);
+      console.error(
+        "DatabaseService Error on method getVehicleMakesTotal",
+        err
+      );
+      throw new Error(
+        `DatabaseService Error on method getVehicleMakesTotal: ${err.message}`
+      );
     }
   }
 
   async getVehicleMakesList(filter: Filter): Promise<VehicleMakeDocument[]> {
     try {
-      const skips = (filter.currentPage - 1) * filter.pages;
+      const skips = (filter.currentPage - 1) * filter.limit;
       return await this.vehicleMakeModel
         .find()
         .skip(skips)
-        .limit(filter.pages)
+        .limit(filter.limit)
         .exec();
     } catch (err) {
-      console.error("Error getting Vehicle Makes list:", err);
+      console.error("DatabaseService Error on method getVehicleMakesList", err);
+      throw new Error(
+        `DatabaseService Error on method getVehicleMakesList: ${err.message}`
+      );
     }
   }
 
@@ -82,7 +103,13 @@ export class DatabaseService {
     try {
       return await this.vehicleTypeModel.findOne({ vehicleTypeId }).exec();
     } catch (err) {
-      console.error("Error getting Vehicle Type:", err);
+      console.error(
+        "DatabaseService Error on method getOneVehicleTypeItem",
+        err
+      );
+      throw new Error(
+        `DatabaseService Error on method getOneVehicleTypeItem: ${err.message}`
+      );
     }
   }
 
@@ -92,7 +119,13 @@ export class DatabaseService {
     try {
       return await this.typeMakeRelationModel.findOne({ makeId }).exec();
     } catch (err) {
-      console.error("Error getting Vehicle Makes count:", err);
+      console.error(
+        "DatabaseService Error on method getOneTypeMakeRelationItem",
+        err
+      );
+      throw new Error(
+        `DatabaseService Error on method getOneTypeMakeRelationItem: ${err.message}`
+      );
     }
   }
 
@@ -108,7 +141,13 @@ export class DatabaseService {
         )
         .exec();
     } catch (err) {
-      console.error("Error saving or updating TypeMakeRelation item:", err);
+      console.error(
+        "DatabaseService Error on method saveOneTypeMakeRelationItem",
+        err
+      );
+      throw new Error(
+        `DatabaseService Error on method saveOneTypeMakeRelationItem: ${err.message}`
+      );
     }
   }
   async saveTypeMakeRelationBulk(
@@ -125,7 +164,13 @@ export class DatabaseService {
 
       await this.typeMakeRelationModel.bulkWrite(bulkOperations);
     } catch (err) {
-      console.error("Error saving Vehicle Types:", err);
+      console.error(
+        "DatabaseService Error on method saveTypeMakeRelationBulk",
+        err
+      );
+      throw new Error(
+        `DatabaseService Error on method saveTypeMakeRelationBulk: ${err.message}`
+      );
     }
   }
 }
