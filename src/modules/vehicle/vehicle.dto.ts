@@ -26,15 +26,15 @@ export class VehicleTypesDTO {
 export class Filter {
   @Field(() => Int)
   @IsInt()
-  @Min(1) // Asume que `currentPage` debe ser al menos 1
+  @Min(1)
   currentPage: number;
 
   @Field(() => Int)
   @IsInt()
-  @Min(1) // Asume que `pages` debe ser al menos 1
+  @Min(1)
   limit: number;
 
-  @Field(() => String, { nullable: true }) // `nullable` indica que el campo es opcional
+  @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
   make?: string;

@@ -13,7 +13,7 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
       playground: true,
       introspection: true,
     }),
-    MongooseModule.forRoot("mongodb://localhost:27017/vehiclesDB"),
+    MongooseModule.forRoot(process.env.MONGODB_URI),
     VehicleModule,
   ],
 })
