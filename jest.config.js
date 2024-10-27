@@ -11,6 +11,7 @@ module.exports = {
     "!**/main.ts",
     "!**/*.spec.ts",
     "!**/*.dto.ts",
+    "!**/*.model.ts",
   ],
   coverageDirectory: "../coverage",
   testEnvironment: "node",
