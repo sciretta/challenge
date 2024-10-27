@@ -2,7 +2,12 @@ import { Injectable, OnModuleInit } from "@nestjs/common";
 import { Filter, VehicleDTO } from "./vehicle.dto";
 import { NetworkService } from "../../providers/network/network.service";
 import { DatabaseService } from "../../providers/database/database.service";
-import { VehicleMake } from "../../common/types";
+import { ParsedResponseVehicleTypes } from "../../common/types";
+import {
+  TypeMakeRelationDocument,
+  VehicleMakeDocument,
+  VehicleTypeDocument,
+} from "src/providers/database/database.model";
 
 @Injectable()
 export class VehicleService implements OnModuleInit {
@@ -12,44 +17,96 @@ export class VehicleService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.fillVehicleMakesCollection();
-    console.log("VehicleMakes collection updated");
+    console.log("Filling database collections");
+    await this.fillInitialCollectionsData();
+    console.log("Database initial collections filled");
   }
 
   async getVehicles(filter: Filter): Promise<VehicleDTO[]> {
-    await this.getVehicleMakes(filter);
-    return [];
-  }
+    const makes = await this.getVehicleMakes(filter);
+    const parsedResponse: VehicleDTO[] = [];
 
-  private async getVehicleMakes(filter: Filter): Promise<VehicleMake[]> {
-    let elementsToReturn: VehicleMake[] = [];
-    if (!this.databaseService.isVehicleMakesDBUpdated()) {
-      elementsToReturn = await this.fillVehicleMakesCollection();
-    } else {
-      elementsToReturn = await this.databaseService.getVehicleMakesList();
+    const promises: Promise<VehicleTypeDocument[]>[] = [];
+    for (const { makeId } of makes) {
+      promises.push(this.getVehicleTypes(makeId));
     }
 
-    console.log(elementsToReturn.length);
+    const vehiclesTypesResults = await Promise.all(promises);
+
+    for (const promiseIndex in vehiclesTypesResults) {
+      const make = makes[promiseIndex];
+      const vehicleTypes = vehiclesTypesResults[promiseIndex];
+      parsedResponse.push({
+        makeId: make.makeId,
+        makeName: make.makeName,
+        vehicleTypes: vehicleTypes.map((item) => ({
+          typeId: item.vehicleTypeId,
+          typeName: item.vehicleTypeName,
+        })),
+      });
+    }
+
+    return parsedResponse;
+  }
+
+  private async getVehicleMakes(
+    filter: Filter
+  ): Promise<VehicleMakeDocument[]> {
+    const elementsToReturn = await this.databaseService.getVehicleMakesList(
+      filter
+    );
 
     return elementsToReturn;
   }
 
-  private async fillVehicleMakesCollection(): Promise<VehicleMake[]> {
-    const totalElementInCollectionPromise =
-      this.databaseService.getVehicleMakesTotal();
-    const vehiclesMakesApiPromise = this.networkService.getVehicleMakes();
+  private async getVehicleTypes(
+    makeId: number
+  ): Promise<VehicleTypeDocument[]> {
+    let elementsToReturn: VehicleTypeDocument[] = [];
+    const typeMakeRelation =
+      await this.databaseService.getOneTypeMakeRelationItem(makeId);
 
-    const [totalElementInCollection, vehiclesMakesApi] = await Promise.all([
-      totalElementInCollectionPromise,
-      vehiclesMakesApiPromise,
-    ]);
+    if (typeMakeRelation.typeIds.length === 0) {
+      const vehicleTypes = await this.networkService.getVehicleTypes(makeId);
+      await Promise.all([
+        this.databaseService.saveOneTypeMakeRelationItem({
+          makeId,
+          typeIds: vehicleTypes.results.map((item) => item.vehicleTypeId),
+        }),
+        this.databaseService.saveVehicleTypeBulk(vehicleTypes.results),
+      ]);
+      elementsToReturn = vehicleTypes.results;
+    } else {
+      const promises = typeMakeRelation.typeIds.map((typeId) =>
+        this.databaseService.getOneVehicleTypeItem(typeId)
+      );
 
-    if (totalElementInCollection !== vehiclesMakesApi.count) {
-      var { results } = vehiclesMakesApi;
-      await this.databaseService.saveVehicleMakesBulk(results);
+      elementsToReturn = await Promise.all(promises);
     }
-    this.databaseService.setLastUpdateVehicleMake();
 
-    return results;
+    return elementsToReturn;
+  }
+
+  private async fillInitialCollectionsData(): Promise<void> {
+    const vehiclesMakesApi = await this.networkService.getVehicleMakes();
+
+    if (
+      (await this.databaseService.getVehicleMakesTotal()) ===
+      vehiclesMakesApi.count
+    )
+      return;
+
+    const typeMakeRelationInitialData: TypeMakeRelationDocument[] =
+      vehiclesMakesApi.results.map((item) => ({
+        typeIds: [],
+        makeId: item.makeId,
+      }));
+
+    await Promise.all([
+      await this.databaseService.saveVehicleMakesBulk(vehiclesMakesApi.results),
+      await this.databaseService.saveTypeMakeRelationBulk(
+        typeMakeRelationInitialData
+      ),
+    ]);
   }
 }

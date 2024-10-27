@@ -1,26 +1,32 @@
 import { Injectable } from "@nestjs/common";
-import { VehicleMake, VehicleType } from "../../common/types";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { DATE_FORMAT } from "../../common/utils/helpers";
-const moment = require("moment");
+import { Filter } from "src/modules/vehicle/vehicle.dto";
+import {
+  TypeMakeRelationDocument,
+  VehicleMakeDocument,
+  VehicleTypeDocument,
+} from "./database.model";
 
 @Injectable()
 export class DatabaseService {
-  LAST_UPDATE_VEHICLE_MAKE_TIME: string | null = null;
-  LAST_UPDATE_VEHICLE_TYPE_TIME: string | null = null;
-
   constructor(
-    @InjectModel("VehicleMake") private vehicleMakeModel: Model<VehicleMake>,
-    @InjectModel("VehicleType") private vehicleTypeModel: Model<VehicleType>
+    @InjectModel("VehicleMake")
+    private vehicleMakeModel: Model<VehicleMakeDocument>,
+    @InjectModel("VehicleType")
+    private vehicleTypeModel: Model<VehicleTypeDocument>,
+    @InjectModel("TypeMakeRelation")
+    private typeMakeRelationModel: Model<TypeMakeRelationDocument>
   ) {}
 
-  async saveVehicleMakesBulk(vehicleMakes: VehicleMake[]): Promise<void> {
+  async saveVehicleMakesBulk(
+    vehicleMakes: VehicleMakeDocument[]
+  ): Promise<void> {
     try {
-      const bulkOperations = vehicleMakes.map((vehicle) => ({
+      const bulkOperations = vehicleMakes.map((make) => ({
         updateOne: {
-          filter: { makeId: vehicle.makeId },
-          update: { $set: vehicle },
+          filter: { makeId: make.makeId },
+          update: { $set: make },
           upsert: true,
         },
       }));
@@ -31,9 +37,19 @@ export class DatabaseService {
     }
   }
 
-  async saveVehicleTypeBulk(vehicleTypes: VehicleType[]): Promise<void> {
+  async saveVehicleTypeBulk(
+    vehicleTypes: VehicleTypeDocument[]
+  ): Promise<void> {
     try {
-      await this.vehicleTypeModel.insertMany(vehicleTypes);
+      const bulkOperations = vehicleTypes.map((type) => ({
+        updateOne: {
+          filter: { vehicleTypeId: type.vehicleTypeId },
+          update: { $set: type },
+          upsert: true,
+        },
+      }));
+
+      await this.vehicleTypeModel.bulkWrite(bulkOperations);
     } catch (err) {
       console.error("Error saving Vehicle Types:", err);
     }
@@ -47,42 +63,69 @@ export class DatabaseService {
     }
   }
 
-  async getVehicleMakesList(): Promise<VehicleMake[]> {
+  async getVehicleMakesList(filter: Filter): Promise<VehicleMakeDocument[]> {
     try {
-      return await this.vehicleMakeModel.find().exec();
+      const skips = (filter.currentPage - 1) * filter.pages;
+      return await this.vehicleMakeModel
+        .find()
+        .skip(skips)
+        .limit(filter.pages)
+        .exec();
     } catch (err) {
       console.error("Error getting Vehicle Makes list:", err);
     }
   }
 
-  getLastUpdateVehicleMake(): string | null {
-    return this.LAST_UPDATE_VEHICLE_MAKE_TIME;
+  async getOneVehicleTypeItem(
+    vehicleTypeId: number
+  ): Promise<VehicleTypeDocument> {
+    try {
+      return await this.vehicleTypeModel.findOne({ vehicleTypeId }).exec();
+    } catch (err) {
+      console.error("Error getting Vehicle Type:", err);
+    }
   }
 
-  getLastUpdateVehicleType(): string | null {
-    return this.LAST_UPDATE_VEHICLE_TYPE_TIME;
+  async getOneTypeMakeRelationItem(
+    makeId: number
+  ): Promise<TypeMakeRelationDocument> {
+    try {
+      return await this.typeMakeRelationModel.findOne({ makeId }).exec();
+    } catch (err) {
+      console.error("Error getting Vehicle Makes count:", err);
+    }
   }
 
-  setLastUpdateVehicleMake(): string | null {
-    const newDate = moment().format(DATE_FORMAT);
-    this.LAST_UPDATE_VEHICLE_MAKE_TIME = newDate;
-    return this.LAST_UPDATE_VEHICLE_MAKE_TIME;
+  async saveOneTypeMakeRelationItem(
+    item: TypeMakeRelationDocument
+  ): Promise<void> {
+    try {
+      await this.typeMakeRelationModel
+        .findOneAndUpdate(
+          { makeId: item.makeId },
+          { $set: item },
+          { upsert: true, new: true }
+        )
+        .exec();
+    } catch (err) {
+      console.error("Error saving or updating TypeMakeRelation item:", err);
+    }
   }
+  async saveTypeMakeRelationBulk(
+    typeMakeRelations: TypeMakeRelationDocument[]
+  ): Promise<void> {
+    try {
+      const bulkOperations = typeMakeRelations.map((type) => ({
+        updateOne: {
+          filter: { makeId: type.makeId },
+          update: { $set: type },
+          upsert: true,
+        },
+      }));
 
-  setLastUpdateVehicleType(): string | null {
-    const newDate = moment().format(DATE_FORMAT);
-    this.LAST_UPDATE_VEHICLE_TYPE_TIME = newDate;
-    return this.LAST_UPDATE_VEHICLE_TYPE_TIME;
-  }
-
-  isVehicleMakesDBUpdated(): boolean {
-    if (!this.LAST_UPDATE_VEHICLE_MAKE_TIME) return false;
-    const targetDate = moment(this.LAST_UPDATE_VEHICLE_MAKE_TIME);
-
-    const isMoreThanOneDayOld = targetDate.isSameOrBefore(
-      moment().subtract(1, "days")
-    );
-
-    return !isMoreThanOneDayOld;
+      await this.typeMakeRelationModel.bulkWrite(bulkOperations);
+    } catch (err) {
+      console.error("Error saving Vehicle Types:", err);
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-export interface VehicleMakeDocument extends Document {
+export interface VehicleMakeDocument {
   makeId: number;
   makeName: string;
 }
@@ -10,7 +10,7 @@ export const vehicleMakeSchema = new Schema({
   makeName: String,
 });
 
-export interface VehicleTypeDocument extends Document {
+export interface VehicleTypeDocument {
   vehicleTypeId: number;
   vehicleTypeName: string;
 }
@@ -20,6 +20,16 @@ export const vehicleTypeSchema = new Schema({
   vehicleTypeName: String,
 });
 
+export interface TypeMakeRelationDocument {
+  makeId: number;
+  typeIds: number[];
+}
+
+export const typeMakeRelationSchema = new Schema({
+  makeId: Number,
+  typeIds: [Number],
+});
+
 export const VehicleMakeModel = model<VehicleMakeDocument>(
   "VehicleMake",
   vehicleMakeSchema
@@ -27,4 +37,8 @@ export const VehicleMakeModel = model<VehicleMakeDocument>(
 export const VehicleTypeModel = model<VehicleTypeDocument>(
   "VehicleType",
   vehicleTypeSchema
+);
+export const TypeMakeRelationModel = model<VehicleMakeDocument>(
+  "TypeMakeRelation",
+  typeMakeRelationSchema
 );

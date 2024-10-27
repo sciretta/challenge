@@ -1,12 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import {
   ParsedResponseVehicleMakes,
-  VehicleMake,
-  VehicleType,
+  ParsedResponseVehicleTypes,
 } from "../../common/types";
 import axios from "axios";
-import { VehicleMakesXmlParser } from "../../common/utils/xml-parser.util";
-import { Filter } from "../../modules/vehicle/vehicle.dto";
+import {
+  VehicleMakesXmlParser,
+  VehicleTypesXmlParser,
+} from "../../common/utils/xml-parser.util";
 
 @Injectable()
 export class NetworkService {
@@ -28,19 +29,18 @@ export class NetworkService {
     }
   }
 
-  private async getVehicleTypes(filter: Filter): Promise<VehicleType[]> {
-    // try {
-    //   const response = await axios.get(
-    //     `${this.BASE_API_URL}/GetVehicleTypesForMakeId/${makeId}?format=xml`
-    //   );
-    //   const vehicleTypesXmlParser = new VehicleTypesXmlParser();
-    //   const jsonData = await vehicleTypesXmlParser.parseXmlToJson(
-    //     response.data
-    //   );
-    //   return jsonData;
-    // } catch (error) {
-    //   throw new Error(`Error fetching types: ${error.message}`);
-    // }
-    return [];
+  async getVehicleTypes(makeId: number): Promise<ParsedResponseVehicleTypes> {
+    try {
+      const response = await axios.get(
+        `${this.BASE_API_URL}/GetVehicleTypesForMakeId/${makeId}?format=xml`
+      );
+      const vehicleTypesXmlParser = new VehicleTypesXmlParser();
+      const jsonData = await vehicleTypesXmlParser.parseXmlToJson(
+        response.data
+      );
+      return jsonData;
+    } catch (error) {
+      throw new Error(`Error fetching types: ${error.message}`);
+    }
   }
 }
