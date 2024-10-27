@@ -19,7 +19,7 @@ type Query {
 
 input Filter {
   currentPage: Int!
-  pages: Int!
+  limit: Int!
   make: String
   type: String
 }
