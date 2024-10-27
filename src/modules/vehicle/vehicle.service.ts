@@ -2,12 +2,11 @@ import { Injectable, OnModuleInit } from "@nestjs/common";
 import { Filter, VehicleDTO } from "./vehicle.dto";
 import { NetworkService } from "../../providers/network/network.service";
 import { DatabaseService } from "../../providers/database/database.service";
-import { ParsedResponseVehicleTypes } from "../../common/types";
 import {
   TypeMakeRelationDocument,
   VehicleMakeDocument,
   VehicleTypeDocument,
-} from "src/providers/database/database.model";
+} from "../../providers/database/database.model";
 
 @Injectable()
 export class VehicleService implements OnModuleInit {
@@ -36,22 +35,33 @@ export class VehicleService implements OnModuleInit {
     for (const promiseIndex in vehiclesTypesResults) {
       const make = makes[promiseIndex];
       const vehicleTypes = vehiclesTypesResults[promiseIndex];
+      let mustBePushed = filter.make
+        ? make.makeName.toLowerCase().includes(filter.make.toLocaleLowerCase())
+        : true;
+      if (!mustBePushed) continue;
+      const vehicleTypesParsed = vehicleTypes.map((item) => {
+        mustBePushed = filter.type
+          ? item.vehicleTypeName
+              .toLocaleLowerCase()
+              .includes(filter.type.toLocaleLowerCase())
+          : true;
+        return {
+          typeId: item.vehicleTypeId,
+          typeName: item.vehicleTypeName,
+        };
+      });
+      if (!mustBePushed) continue;
       parsedResponse.push({
         makeId: make.makeId,
         makeName: make.makeName,
-        vehicleTypes: vehicleTypes.map((item) => ({
-          typeId: item.vehicleTypeId,
-          typeName: item.vehicleTypeName,
-        })),
+        vehicleTypes: vehicleTypesParsed,
       });
     }
 
     return parsedResponse;
   }
 
-  private async getVehicleMakes(
-    filter: Filter
-  ): Promise<VehicleMakeDocument[]> {
+  async getVehicleMakes(filter: Filter): Promise<VehicleMakeDocument[]> {
     const elementsToReturn = await this.databaseService.getVehicleMakesList(
       filter
     );
@@ -59,9 +69,7 @@ export class VehicleService implements OnModuleInit {
     return elementsToReturn;
   }
 
-  private async getVehicleTypes(
-    makeId: number
-  ): Promise<VehicleTypeDocument[]> {
+  async getVehicleTypes(makeId: number): Promise<VehicleTypeDocument[]> {
     let elementsToReturn: VehicleTypeDocument[] = [];
     const typeMakeRelation =
       await this.databaseService.getOneTypeMakeRelationItem(makeId);
@@ -87,7 +95,7 @@ export class VehicleService implements OnModuleInit {
     return elementsToReturn;
   }
 
-  private async fillInitialCollectionsData(): Promise<void> {
+  async fillInitialCollectionsData(): Promise<void> {
     const vehiclesMakesApi = await this.networkService.getVehicleMakes();
 
     if (
