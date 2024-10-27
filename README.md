@@ -32,6 +32,8 @@ This is a NestJS and MongoDB application that provides a GraphQL API for queryin
 
 2. Ensure Docker is installed and running on your system.
 
+3. When running the server for first time you need to wait 40 seconds approximately to fill the initial data in the VehicleMakes and TypeMakeRelations collections.
+
 ---
 
 ## Configuration
@@ -52,13 +54,19 @@ This is a NestJS and MongoDB application that provides a GraphQL API for queryin
 
 To run the app locally with Docker Compose, follow these steps:
 
-1. **Start mongo container with**:
+1. **Install dependencies locally**:
+
+   ```bash
+   npm install
+   ```
+
+2. **Start mongo container with**:
 
    ```bash
    docker run -d --name mongodb -p 27017:27017 mongo
    ```
 
-2. **Build and start the environment**:
+3. **Start server in dev mode**:
    ```bash
    npm run start:dev
    ```

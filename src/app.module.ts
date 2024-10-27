@@ -4,9 +4,13 @@ import { VehicleModule } from "./modules/vehicle/vehicle.module";
 import { GraphQLModule } from "@nestjs/graphql";
 import { join } from "path";
 import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: ".env",
+    }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), "src/schema.gql"),
