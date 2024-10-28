@@ -2,6 +2,11 @@
 
 This is a NestJS and MongoDB application that provides a GraphQL API for querying vehicles and their types. It uses data from an external API, stores it in MongoDB, and allows filtered querying of vehicle makes and types. This guide explains the setup, configuration, and how to run the project both locally and in production.
 
+# Notes
+
+- Every time a request is made with a specific currentPage and limit filter for first time to the server in general, not the user's first request but in general, this request can last more than 1 second since the data of the VehicleType collection it is saved as a new VehicleType is consulted, which means that when the vehicleType is in base the request will be made to the database which responds in times of up to 20 ms, that delay can be noticed by the first users who make requests but not by the rest of the users.
+- I only made pipelines for linter and for the tests, I don't have a dockerhub account so it was difficult for me to upload my dochercompose to dockerhub registry, sorry for the inconvenience.
+
 ## Table of Contents
 
 - [Requirements](#requirements)
