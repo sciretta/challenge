@@ -117,7 +117,7 @@ Use http://localhost:3000/graphql to test api:
 
    ```
 
-   You can filter by currentPage, limit of elements (using > 50 as limit can give problems), make for makeName and type for typeName
+   You can filter by currentPage, limit of elements (using > 50 as limit can give problems associated with API requests block), make for makeName and type for typeName
 
 2. **Possible Graphql response**:
 
