@@ -1,8 +1,8 @@
-import { Module } from "@nestjs/common";
-import { NetworkService } from "./network.service";
+import { Module } from '@nestjs/common'
+import { NetworkService } from './network.service'
 
 @Module({
   imports: [],
-  providers: [NetworkService],
+  providers: [NetworkService]
 })
 export class NetworkModule {}

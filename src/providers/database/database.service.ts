@@ -1,25 +1,25 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { Filter } from "src/modules/vehicle/vehicle.dto";
+import { Injectable } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
+import { Filter } from 'src/modules/vehicle/vehicle.dto'
 import {
   TypeMakeRelationDocument,
   VehicleMakeDocument,
-  VehicleTypeDocument,
-} from "./database.model";
+  VehicleTypeDocument
+} from './database.model'
 
 @Injectable()
 export class DatabaseService {
-  constructor(
-    @InjectModel("VehicleMake")
-    private vehicleMakeModel: Model<VehicleMakeDocument>,
-    @InjectModel("VehicleType")
-    private vehicleTypeModel: Model<VehicleTypeDocument>,
-    @InjectModel("TypeMakeRelation")
-    private typeMakeRelationModel: Model<TypeMakeRelationDocument>
+  constructor (
+    @InjectModel('VehicleMake')
+    private readonly vehicleMakeModel: Model<VehicleMakeDocument>,
+    @InjectModel('VehicleType')
+    private readonly vehicleTypeModel: Model<VehicleTypeDocument>,
+    @InjectModel('TypeMakeRelation')
+    private readonly typeMakeRelationModel: Model<TypeMakeRelationDocument>
   ) {}
 
-  async saveVehicleMakesBulk(
+  async saveVehicleMakesBulk (
     vehicleMakes: VehicleMakeDocument[]
   ): Promise<void> {
     try {
@@ -27,23 +27,23 @@ export class DatabaseService {
         updateOne: {
           filter: { makeId: make.makeId },
           update: { $set: make },
-          upsert: true,
-        },
-      }));
+          upsert: true
+        }
+      }))
 
-      await this.vehicleMakeModel.bulkWrite(bulkOperations);
+      await this.vehicleMakeModel.bulkWrite(bulkOperations)
     } catch (err) {
       console.error(
-        "DatabaseService Error on method saveVehicleMakesBulk",
+        'DatabaseService Error on method saveVehicleMakesBulk',
         err
-      );
+      )
       throw new Error(
         `DatabaseService Error on method saveVehicleMakesBulk: ${err.message}`
-      );
+      )
     }
   }
 
-  async saveVehicleTypeBulk(
+  async saveVehicleTypeBulk (
     vehicleTypes: VehicleTypeDocument[]
   ): Promise<void> {
     try {
@@ -51,85 +51,85 @@ export class DatabaseService {
         updateOne: {
           filter: { vehicleTypeId: type.vehicleTypeId },
           update: { $set: type },
-          upsert: true,
-        },
-      }));
+          upsert: true
+        }
+      }))
 
-      await this.vehicleTypeModel.bulkWrite(bulkOperations);
+      await this.vehicleTypeModel.bulkWrite(bulkOperations)
     } catch (err) {
       console.error(
-        "DatabaseService Error on method saveVehicleTypeBulk:",
+        'DatabaseService Error on method saveVehicleTypeBulk:',
         err
-      );
+      )
       throw new Error(
         `DatabaseService Error on method saveVehicleTypeBulk: ${err.message}`
-      );
+      )
     }
   }
 
-  async getVehicleMakesTotal(): Promise<number> {
+  async getVehicleMakesTotal (): Promise<number> {
     try {
-      return await this.vehicleMakeModel.countDocuments().exec();
+      return await this.vehicleMakeModel.countDocuments().exec()
     } catch (err) {
       console.error(
-        "DatabaseService Error on method getVehicleMakesTotal",
+        'DatabaseService Error on method getVehicleMakesTotal',
         err
-      );
+      )
       throw new Error(
         `DatabaseService Error on method getVehicleMakesTotal: ${err.message}`
-      );
+      )
     }
   }
 
-  async getVehicleMakesList(filter: Filter): Promise<VehicleMakeDocument[]> {
+  async getVehicleMakesList (filter: Filter): Promise<VehicleMakeDocument[]> {
     try {
-      const skips = (filter.currentPage - 1) * filter.limit;
+      const skips = (filter.currentPage - 1) * filter.limit
       return await this.vehicleMakeModel
         .find()
         .skip(skips)
         .limit(filter.limit)
-        .exec();
+        .exec()
     } catch (err) {
-      console.error("DatabaseService Error on method getVehicleMakesList", err);
+      console.error('DatabaseService Error on method getVehicleMakesList', err)
       throw new Error(
         `DatabaseService Error on method getVehicleMakesList: ${err.message}`
-      );
+      )
     }
   }
 
-  async getOneVehicleTypeItem(
+  async getOneVehicleTypeItem (
     vehicleTypeId: number
   ): Promise<VehicleTypeDocument> {
     try {
-      return await this.vehicleTypeModel.findOne({ vehicleTypeId }).exec();
+      return await this.vehicleTypeModel.findOne({ vehicleTypeId }).exec()
     } catch (err) {
       console.error(
-        "DatabaseService Error on method getOneVehicleTypeItem",
+        'DatabaseService Error on method getOneVehicleTypeItem',
         err
-      );
+      )
       throw new Error(
         `DatabaseService Error on method getOneVehicleTypeItem: ${err.message}`
-      );
+      )
     }
   }
 
-  async getOneTypeMakeRelationItem(
+  async getOneTypeMakeRelationItem (
     makeId: number
   ): Promise<TypeMakeRelationDocument> {
     try {
-      return await this.typeMakeRelationModel.findOne({ makeId }).exec();
+      return await this.typeMakeRelationModel.findOne({ makeId }).exec()
     } catch (err) {
       console.error(
-        "DatabaseService Error on method getOneTypeMakeRelationItem",
+        'DatabaseService Error on method getOneTypeMakeRelationItem',
         err
-      );
+      )
       throw new Error(
         `DatabaseService Error on method getOneTypeMakeRelationItem: ${err.message}`
-      );
+      )
     }
   }
 
-  async saveOneTypeMakeRelationItem(
+  async saveOneTypeMakeRelationItem (
     item: TypeMakeRelationDocument
   ): Promise<void> {
     try {
@@ -139,18 +139,19 @@ export class DatabaseService {
           { $set: item },
           { upsert: true, new: true }
         )
-        .exec();
+        .exec()
     } catch (err) {
       console.error(
-        "DatabaseService Error on method saveOneTypeMakeRelationItem",
+        'DatabaseService Error on method saveOneTypeMakeRelationItem',
         err
-      );
+      )
       throw new Error(
         `DatabaseService Error on method saveOneTypeMakeRelationItem: ${err.message}`
-      );
+      )
     }
   }
-  async saveTypeMakeRelationBulk(
+
+  async saveTypeMakeRelationBulk (
     typeMakeRelations: TypeMakeRelationDocument[]
   ): Promise<void> {
     try {
@@ -158,19 +159,19 @@ export class DatabaseService {
         updateOne: {
           filter: { makeId: type.makeId },
           update: { $set: type },
-          upsert: true,
-        },
-      }));
+          upsert: true
+        }
+      }))
 
-      await this.typeMakeRelationModel.bulkWrite(bulkOperations);
+      await this.typeMakeRelationModel.bulkWrite(bulkOperations)
     } catch (err) {
       console.error(
-        "DatabaseService Error on method saveTypeMakeRelationBulk",
+        'DatabaseService Error on method saveTypeMakeRelationBulk',
         err
-      );
+      )
       throw new Error(
         `DatabaseService Error on method saveTypeMakeRelationBulk: ${err.message}`
-      );
+      )
     }
   }
 }

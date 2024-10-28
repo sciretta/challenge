@@ -1,44 +1,44 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose'
 
 export interface VehicleMakeDocument {
-  makeId: number;
-  makeName: string;
+  makeId: number
+  makeName: string
 }
 
 export const vehicleMakeSchema = new Schema({
   makeId: Number,
-  makeName: String,
-});
+  makeName: String
+})
 
 export interface VehicleTypeDocument {
-  vehicleTypeId: number;
-  vehicleTypeName: string;
+  vehicleTypeId: number
+  vehicleTypeName: string
 }
 
 export const vehicleTypeSchema = new Schema({
   vehicleTypeId: Number,
-  vehicleTypeName: String,
-});
+  vehicleTypeName: String
+})
 
 export interface TypeMakeRelationDocument {
-  makeId: number;
-  typeIds: number[];
+  makeId: number
+  typeIds: number[]
 }
 
 export const typeMakeRelationSchema = new Schema({
   makeId: Number,
-  typeIds: [Number],
-});
+  typeIds: [Number]
+})
 
 export const VehicleMakeModel = model<VehicleMakeDocument>(
-  "VehicleMake",
+  'VehicleMake',
   vehicleMakeSchema
-);
+)
 export const VehicleTypeModel = model<VehicleTypeDocument>(
-  "VehicleType",
+  'VehicleType',
   vehicleTypeSchema
-);
+)
 export const TypeMakeRelationModel = model<VehicleMakeDocument>(
-  "TypeMakeRelation",
+  'TypeMakeRelation',
   typeMakeRelationSchema
-);
+)
