@@ -4,7 +4,7 @@ This is a NestJS and MongoDB application that provides a GraphQL API for queryin
 
 # Notes
 
-- Every time a request is made with a specific currentPage and limit filter for first time to the server in general, not the user's first request but in general, this request can last more than 1 second since the data of the VehicleType collection it is saved as a new VehicleType is consulted, which means that when the vehicleType is in base the request will be made to the database which responds in times of up to 20 ms, that delay can be noticed by the first users who make requests but not by the rest of the users.
+- Every time a request is made with a specific currentPage and limit filter for first time to the server in general, not the user's first request but in general, this request can last more than 1 second since the data of the VehicleType collection it is saved as a new VehicleType is consulted, which means that when the vehicleType is in base the request will be made to the database which responds in times of up to 10 ms, that delay can be noticed by the first users who make requests but not by the rest of the users.
 - I only made pipelines for linter and for the tests, I don't have a dockerhub account so it was difficult for me to upload my dochercompose to dockerhub registry, sorry for the inconvenience.
 
 ## Table of Contents
@@ -14,6 +14,7 @@ This is a NestJS and MongoDB application that provides a GraphQL API for queryin
 - [Configuration](#configuration)
 - [Local Development](#local-development)
 - [Production Deployment](#production-deployment)
+- [Fetch Graphql](#fetch-graphql)
 - [Project Structure](#project-structure)
 - [Testing](#testing)
 
@@ -97,6 +98,59 @@ To deploy the application in production, follow these steps:
      docker-compose logs -f
      ```
 
+## Fetch Graphql
+
+Use http://localhost:3000/graphql to test api:
+
+1. **Query example using Graphql**:
+
+   ```bash
+   query GetVehicles{
+       getVehicles(filter:{currentPage:1,limit:2,make:"",type:""}){
+          makeId
+          makeName
+          vehicleTypes{
+             typeId
+             typeName
+          }
+       }
+
+   ```
+
+   You can filter by currentPage, limit of elements (using > 50 as limit can give problems), make for makeName and type for typeName
+
+2. **Possible Graphql response**:
+
+   ```bash
+   {
+      "data": {
+         "getVehicles": [
+            {
+            "makeId": 12858,
+            "makeName": "#1 ALPINE CUSTOMS",
+            "vehicleTypes": [
+                  {
+                     "typeId": 6,
+                     "typeName": "Trailer"
+                  }
+               ]
+            },
+            {
+            "makeId": 4877,
+            "makeName": "1/OFF KUSTOMS, LLC",
+            "vehicleTypes": [
+                  {
+                     "typeId": 1,
+                     "typeName": "Motorcycle"
+                  }
+               ]
+            }
+         ]
+      }
+   }
+
+   ```
+
 ## Project Structure
 
 The following describes the main files and directories in this project:
@@ -136,3 +190,6 @@ Here are some commands to run testing cases:
   To watch the coverage you can go to the following path
 
 - **.\coverage\lcov-report\index.html**
+
+- **Actual coverage**
+  ![alt text](image.png)
