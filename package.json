@@ -48,6 +48,7 @@
     "ignore": [
       "dist",
       "**/*.spec.js",
+      "src",
       "main.ts",
       "src/app.module.ts",
       "src/common"
