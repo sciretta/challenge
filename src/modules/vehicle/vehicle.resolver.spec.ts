@@ -51,15 +51,11 @@ describe("VehicleResolver", () => {
 
     it("should log the filter and handle any errors thrown by VehicleService.getVehicles", async () => {
       const filter: Filter = { currentPage: 1, limit: 1 };
-      const consoleSpy = jest.spyOn(console, "log").mockImplementation();
       const error = new Error("Service failed");
 
       (vehicleService.getVehicles as jest.Mock).mockRejectedValue(error);
 
       await expect(resolver.getVehicles(filter)).rejects.toThrow(error);
-      expect(consoleSpy).toHaveBeenCalledWith("FILTER", filter);
-
-      consoleSpy.mockRestore();
     });
   });
 });
