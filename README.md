@@ -47,7 +47,7 @@ This is a NestJS and MongoDB application that provides a GraphQL API for queryin
 1. Create a `.env` file in the project root directory for environment variables. The file should include:
 
    ```env
-   MONGODB_URI=mongodb://mongo:27017/mydatabase
+   MONGODB_URI=mongodb://localhost:27017/mydatabase
    ```
 
 2. The `docker-compose.yml` file configures MongoDB and the application containers. The app connects to MongoDB using the `mongo` service name.
